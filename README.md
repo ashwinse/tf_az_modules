@@ -10,8 +10,10 @@ module "rg" {
   location = var.location
   tags     = var.tags
 }
+~~~
 
-##### With For-each - AV SETs ##########
+#### LOOPING through Terraform Modules using For-Each
+~~~
 variable "avsets" {
   type = map(object({
     name                        = string
@@ -40,9 +42,9 @@ module "avset" {
   platform_fault_domain_count = each.value.platform_fault_domain_count
   tags                        = module.rg["xxx"].tags
 }
-
+~~~
 ##### Virtual Network
-
+~~~
 module "vnet" {
   source              = "git::https://github.com/ashwinse/tf_az_modules.git//vnet?ref=main"
   name                = "${var.prefix}-vnet"
@@ -53,7 +55,7 @@ module "vnet" {
 }
 ~~~
 
-#### LOOPING through Terraform Modules
+#### LOOPING through Terraform Modules using count
 
 ~~~
 module "subnet" {
