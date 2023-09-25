@@ -41,9 +41,14 @@ variable "network_interface_ids" {
 variable "custom_data" {
   default = null
 }
+variable "os_disk_name" {
+  default = null
+}
 variable "os_disk_caching" {}      # "ReadWrite"
 variable "storage_account_type" {} # "Standard_LRS"
-variable "disk_size_gb" {}
+variable "disk_size_gb" {
+  default = null
+}
 variable "source_image_id" {
   default = null
 }

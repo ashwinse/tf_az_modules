@@ -32,6 +32,7 @@ resource "azurerm_linux_virtual_machine" "vml" {
     caching              = var.os_disk_caching      # "ReadWrite"
     storage_account_type = var.storage_account_type # "Standard_LRS"
     disk_size_gb         = var.disk_size_gb
+    name                 = var.os_disk_name
   }
 
   dynamic "plan" {

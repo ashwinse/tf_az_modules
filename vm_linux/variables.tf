@@ -46,6 +46,9 @@ variable "availability_set_id" {
 variable "network_interface_ids" {
   type = list(any)
 }
+variable "os_disk_name" {
+  default = null
+}
 variable "os_disk_caching" {}      # "ReadWrite"
 variable "storage_account_type" {} # "Standard_LRS"
 variable "disk_size_gb" {

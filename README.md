@@ -5,48 +5,14 @@
 
 ~~~
 module "rg" {
-  source   = "git::https://github.com/ashwinse/tf_az_modules.git//resource_group?ref=main"
+  source   = "git::https://github.com/onxpress/tf_az_base_modules.git//resource_group?ref=main"
   name     = "${var.prefix}-rg"
   location = var.location
   tags     = var.tags
 }
-~~~
 
-#### LOOPING through Terraform Modules using For-Each
-~~~
-variable "avsets" {
-  type = map(object({
-    name                        = string
-    managed                     = optional(bool, true)
-    platform_fault_domain_count = optional(number, 2)
-  }))
-}
-
-avsets = {
-  avail-zds-adds-01 = {
-    name = "avail-01"
-  }
-  avail-zds-ddc-01 = {
-    name = "avail-02"
-  }
-}
-
-
-module "avset" {
-  source                      = "git::https://github.com/ashwin2se/tf_az_base_modules.git//availability_set?ref=main"
-  for_each                    = var.avsets
-  name                        = each.value.name
-  location                    = module.rg["xxx"].location
-  resource_group_name         = module.rg["xxx"].name
-  managed                     = each.value.managed
-  platform_fault_domain_count = each.value.platform_fault_domain_count
-  tags                        = module.rg["xxx"].tags
-}
-~~~
-##### Virtual Network
-~~~
 module "vnet" {
-  source              = "git::https://github.com/ashwinse/tf_az_modules.git//vnet?ref=main"
+  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//vnet?ref=main"
   name                = "${var.prefix}-vnet"
   location            = module.rg.location
   resource_group_name = module.rg.name
@@ -55,11 +21,11 @@ module "vnet" {
 }
 ~~~
 
-#### LOOPING through Terraform Modules using count
+#### LOOPING through Terraform Modules
 
 ~~~
 module "subnet" {
-  source               = "git::https://github.com/ashwinse/tf_az_modules.git//subnet?ref=main"
+  source               = "git::https://github.com/onxpress/tf_az_base_modules.git//subnet?ref=main"
   count                = 2
   name                 = "${var.prefix}-subnet${count.index + 1}"
   resource_group_name  = module.rg.name
@@ -86,7 +52,7 @@ locals {
 }
 
 module "nsr" {
-  source                      = "git::https://github.com/ashwinse/tf_az_modules.git//nsr?ref=main"
+  source                      = "git::https://github.com/onxpress/tf_az_base_modules.git//nsr?ref=main"
   count                       = 2
   name                        = element(local.name, count.index)
   priority                    = "20${count.index + 1}"
