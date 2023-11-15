@@ -1,6 +1,6 @@
 /*
 module "rg" {
-  source   = "git::https://github.com/onxpress/tf_az_base_modules.git//resource_group?ref=main"
+  source   = "./modules/resource_group"
   name     = "${var.prefix}-rg"
   location = var.location
   tags     = var.tags
@@ -9,7 +9,7 @@ module "rg" {
 
 
 module "vnet" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//vnet?ref=main"
+  source              = "./modules/vnet"
   name                = "${var.prefix}-vnet"
   location            = module.rg.location
   resource_group_name = module.rg.name
@@ -22,7 +22,7 @@ module "vnet" {
 
 
 module "subnet" {
-  source               = "git::https://github.com/onxpress/tf_az_base_modules.git//subnet?ref=main"
+  source               = "./modules/subnet"
   count                = 2
   name                 = "${var.prefix}-subnet${count.index + 1}"
   resource_group_name  = module.rg.name
@@ -37,7 +37,7 @@ module "subnet" {
 }
 
 module "route_table" {
-  source                        = "git::https://github.com/onxpress/tf_az_base_modules.git//route_table?ref=main"
+  source                        = "./modules/route_table"
   name                          = "${var.prefix}-rt"
   location                      = module.rg.location
   resource_group_name           = module.rg.name
@@ -46,7 +46,7 @@ module "route_table" {
 }
 
 module "route" {
-  source                 = "git::https://github.com/onxpress/tf_az_base_modules.git//route?ref=main"
+  source                 = "./modules/route"
   name                   = "${var.prefix}-rtr"
   resource_group_name    = module.rg.name
   route_table_name       = module.route_table.name
@@ -58,13 +58,13 @@ module "route" {
 
 
 module "rt_snet_attach" {
-  source         = "git::https://github.com/onxpress/tf_az_base_modules.git//route_table_subnet_attach?ref=main"
+  source         = "./modules/route_table_subnet_attach"
   subnet_id      = module.subnet[0].id
   route_table_id = module.route_table.id
 }
 
 module "avs" {
-  source                      = "git::https://github.com/onxpress/tf_az_base_modules.git//availability_set?ref=main"
+  source                      = "./modules/availability_set"
   name                        = "${var.prefix}-avs"
   location                    = module.rg.location
   resource_group_name         = module.rg.name
@@ -76,7 +76,7 @@ module "avs" {
 
 
 module "ddosplan" {
-  source = "git::https://github.com/onxpress/tf_az_base_modules.git//ddos_protection_plan?ref=main"
+  source = "./modules/ddos_protection_plan"
   name                = "${var.prefix}-ddos_p_plan"
   location            = module.rg.location
   resource_group_name = module.rg.name
@@ -87,7 +87,7 @@ module "ddosplan" {
 
 
 module "nsg" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//nsg?ref=main"
+  source              = "./modules/nsg"
   name                = "${var.prefix}-nsg"
   location            = module.rg.location
   resource_group_name = module.rg.name
@@ -106,7 +106,7 @@ locals {
 }
 
 module "nsr" {
-  source                      = "git::https://github.com/onxpress/tf_az_base_modules.git//nsr?ref=main"
+  source                      = "./modules/nsr"
   count                       = 2
   name                        = element(local.name, count.index)
   priority                    = "20${count.index + 1}"
@@ -122,7 +122,7 @@ module "nsr" {
 }
 
 module "nsg_snet_attach" {
-  source = "git::https://github.com/onxpress/tf_az_base_modules.git//nsg_subnet_attach?ref=main"
+  source = "./modules/nsg_subnet_attach"
   subnet_id                 = module.subnet[0].id
   network_security_group_id = module.nsg.id
 }
@@ -130,7 +130,7 @@ module "nsg_snet_attach" {
 
 
 module "sa" {
-  source                   = "git::https://github.com/onxpress/tf_az_base_modules.git//storage_account?ref=main"
+  source                   = "./modules/storage_account"
   name                     = "${var.prefix}sa${random_id.id.hex}"
   location                 = module.rg.location
   resource_group_name      = module.rg.name
@@ -162,7 +162,7 @@ module "sa" {
 } 
 
 module "pip" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//public_ip?ref=main"
+  source              = "./modules/public_ip"
   name                = "${var.prefix}-pip"
   location            = module.rg.location
   resource_group_name = module.rg.name
@@ -172,7 +172,7 @@ module "pip" {
 }
 
 module "wnic" {
-  source                        = "git::https://github.com/onxpress/tf_az_base_modules.git//network_interface?ref=main"
+  source                        = "./modules/network_interface"
   name                          = "${var.prefix}-wnic"
   location                      = module.rg.location
   resource_group_name           = module.rg.name
@@ -183,7 +183,7 @@ module "wnic" {
 }
 
 module "md" {
-  source               = "git::https://github.com/onxpress/tf_az_base_modules.git//managed_disk?ref=main"
+  source               = "./modules/managed_disk"
   name                 = "dd-${var.prefix}-d-01"
   location             = module.rg.location
   resource_group_name  = module.rg.name
@@ -196,7 +196,7 @@ module "md" {
 }
 
 module "vmw" {
-  source                   = "git::https://github.com/onxpress/tf_az_base_modules.git//vm_windows?ref=main"
+  source                   = "./modules/vm_windows"
   name                     = "${var.prefix}-vmw"
   resource_group_name      = module.rg.name
   location                 = module.rg.location
@@ -221,7 +221,7 @@ module "vmw" {
 
 
 module "lnic" {
-  source                        = "git::https://github.com/onxpress/tf_az_base_modules.git//network_interface?ref=main"
+  source                        = "./modules/network_interface"
   name                          = "${var.prefix}-lnic"
   location                      = module.rg.location
   resource_group_name           = module.rg.name
@@ -232,7 +232,7 @@ module "lnic" {
 }
 
 module "vml" {
-  source                          = "git::https://github.com/onxpress/tf_az_base_modules.git//vm_linux?ref=main"
+  source                          = "./modules/vm_linux"
   name                            = "${var.prefix}-vml"
   resource_group_name             = module.rg.name
   location                        = module.rg.location
@@ -257,14 +257,14 @@ module "vml" {
 
 
 module "vmw-md" {
-  source = "git::https://github.com/onxpress/tf_az_base_modules.git//managed_disk_attach?ref=main" 
+  source = "./modules/managed_disk_attach" 
   managed_disk_id    = module.md.id
   virtual_machine_id = module.vmw.id
   lun                = "10"
   caching            = "None"
 }
 module "vml-md" {
-  source = "git::https://github.com/onxpress/tf_az_base_modules.git//managed_disk_attach?ref=main"
+  source = "./modules/managed_disk_attach"
   managed_disk_id    = module.md.id
   virtual_machine_id = module.vml.id
   lun                = "11"
@@ -274,7 +274,7 @@ module "vml-md" {
 
 
 module "kv" {
-  source                 = "git::https://github.com/onxpress/tf_az_base_modules.git//key_vault?ref=main"
+  source                 = "./modules/key_vault"
   name                   = "${var.prefix}-kv-${random_id.id.hex}"
   location               = module.rg.location
   resource_group_name    = module.rg.name
@@ -289,7 +289,7 @@ module "kv" {
 
 
 module "pip2" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//public_ip?ref=main"
+  source              = "./modules/public_ip"
   name                = "${var.prefix}-pip2"
   location            = module.rg.location
   resource_group_name = module.rg.name
@@ -299,7 +299,7 @@ module "pip2" {
 }
 
 module "lb" {
-  source                         = "git::https://github.com/onxpress/tf_az_base_modules.git//lb?ref=main"
+  source                         = "./modules/lb"
   name                           = "${var.prefix}-lb"
   location                       = module.rg.location
   resource_group_name            = module.rg.name
@@ -310,14 +310,14 @@ module "lb" {
 }
 
 module "lbap" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//lb_backend_address_pool?ref=main"
+  source              = "./modules/lb_backend_address_pool"
   resource_group_name = module.rg.name
   loadbalancer_id     = module.lb.id
   name                = "${var.prefix}-lb-bkpool"
 }
 
 module "lbp" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//lb_probe?ref=main"
+  source              = "./modules/lb_probe"
   loadbalancer_id     = module.lb.id
   resource_group_name = module.rg.name
   name                = "ssh_hlth_probe"
@@ -326,7 +326,7 @@ module "lbp" {
 
 
 module "lbr" {
-  source                         = "git::https://github.com/onxpress/tf_az_base_modules.git//lb_rule?ref=main"
+  source                         = "./modules/lb_rule"
   resource_group_name            = module.rg.name
   loadbalancer_id                = module.lb.id
   name                           = "${var.prefix}-lb-rule"
@@ -339,7 +339,7 @@ module "lbr" {
 }
 
 module "lbnp" {
-  source = "git::https://github.com/onxpress/tf_az_base_modules.git//lb_nat_pool?ref=main"
+  source = "./modules/lb_nat_pool"
   resource_group_name = module.rg.name
   loadbalancer_id = module.lb.id
   name = "${var.prefix}-nat-pool"
@@ -353,7 +353,7 @@ module "lbnp" {
 
 
  module "lbnr" {
-  source                         = "git::https://github.com/onxpress/tf_az_base_modules.git//lb_nat_rule?ref=main"
+  source                         = "./modules/lb_nat_rule"
   resource_group_name            = module.rg.name
   loadbalancer_id                = module.lb.id
   name                           = "${var.prefix}-lb-natrule"
@@ -375,7 +375,7 @@ resource "random_id" "id" {
 }
 
 module "rg" {
-  source   = "git::https://github.com/onxpress/tf_az_base_modules.git//resource_group?ref=main"
+  source   = "./modules/resource_group"
   for_each = var.resource_group
   name     = each.value.name
   location = each.value.location
@@ -384,7 +384,7 @@ module "rg" {
 
 
 module "vnet" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//vnet?ref=main"
+  source              = "./modules/vnet"
   for_each            = var.vnet
   name                = each.value.name
   location            = module.rg["rg0"].location
@@ -394,7 +394,7 @@ module "vnet" {
 }
 
 module "subnet" {
-  source               = "git::https://github.com/onxpress/tf_az_base_modules.git//subnet?ref=main"
+  source               = "./modules/subnet"
   for_each             = var.subnets
   name                 = each.value.name
   resource_group_name  = module.rg["rg0"].name
@@ -403,7 +403,7 @@ module "subnet" {
 }
 /*
 module "pip" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//public_ip?ref=main"
+  source              = "./modules/public_ip"
   for_each             = var.public_ip
   name                = each.value.name
   location            = module.rg["rg0"].location
@@ -415,7 +415,7 @@ module "pip" {
 
 
 module "avset" {
-  source                      = "git::https://github.com/onxpress/tf_az_base_modules.git//availability_set?ref=main"
+  source                      = "./modules/availability_set"
   for_each                    = var.avsets
   name                        = each.value.name
   location                    = module.rg["rg0"].location
@@ -426,7 +426,7 @@ module "avset" {
 }
 
 module "vm_pack" {
-  source                   = "./vm_pack" # "git::https://github.com/onxpress/tf_az_base_modules.git//vm_pack?ref=main"
+  source                   = "./vm_pack" # "./modules/vm_pack"
   depends_on               = [module.rg, module.vnet, module.subnet, module.avset, module.pip]
   os_type                  = each.value.os_type
   for_each                 = var.vms
