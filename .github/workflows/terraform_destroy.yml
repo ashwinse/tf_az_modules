@@ -1,0 +1,80 @@
+name: 'Terraform Destroy'
+env:
+  PROJECT_DIR: "${{github.workspace}}/project"
+on:
+  # push:
+  #   branches: [ "main" ]
+  workflow_dispatch:
+    
+permissions:
+  contents: read
+
+jobs:
+  terraform-destroy:
+    name: 'Terraform-Destroy'
+    runs-on: ubuntu-latest
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout Base Module Repo
+      uses: actions/checkout@v4
+      with:
+        repository: onxpress/tf_az_base_modules
+        type: git
+        ref: main
+        path: ./tf_az_base_modules
+        token: ${{ secrets.TF_PAT }}
+
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout project repo
+      uses: actions/checkout@v4
+      with:
+        ref: main
+        path: ./project
+        token: ${{ secrets.TF_PAT }}
+
+
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        allow-no-subscriptions: true
+    
+    - name: Processing Repo
+      run: |
+        sudo apt-get install dos2unix -y
+        find . -type d \( -path './project/.git' -o -path './tf_az_base_modules/.git' -o -path './.git' -o -path './.github' \) -prune -o -type f -exec dos2unix {} +
+        find . -type f -name '*.tf' -exec sed -i.bak 's|git::https://github.com/onxpress/tf_az_base_modules\.git/|${{github.workspace}}/tf_az_base_modules|g' {} \;
+        find . -type f -name '*.tf' -exec sed -i.bak 's|\?ref=main||g' {} \;
+        find . -type f -name '*.bak' -delete 
+      working-directory: ${{github.workspace}}
+      
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_wrapper: false
+        terraform_version: "1.5.7"
+  
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: |
+        az account set -s ${{ vars.SUBSCRIPTION_ID }}
+        terraform init -backend-config="storage_account_name=${{ vars.backend_storage_account_name }}" -backend-config="container_name=${{ vars.backend_container_name }}" -backend-config="key=${{ vars.backend_statefile_name }}" -backend-config="access_key=${{ secrets.access_key }}"
+      working-directory: ${{ env.PROJECT_DIR }}
+
+    # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Terraform Format
+      run: terraform fmt -check
+      working-directory: ${{ env.PROJECT_DIR }}
+
+      # On push to "main", build or change infrastructure according to Terraform configuration files
+    #   # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+    # - name: Terraform Destroy
+    #   # if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
+    #   run: terraform destroy -auto-approve -input=false
+    #   working-directory: ${{ env.PROJECT_DIR }}
