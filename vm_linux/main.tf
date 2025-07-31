@@ -7,18 +7,19 @@ resource "azurerm_linux_virtual_machine" "vml" {
   disable_password_authentication = var.disable_password_authentication
   availability_set_id             = var.availability_set_id
   admin_password                  = var.admin_password # "P@$$w0rd1234!"
-  custom_data                     = var.custom_data
-  user_data                       = var.user_data
-  edge_zone                       = var.edge_zone
-  encryption_at_host_enabled      = var.encryption_at_host_enabled
-  patch_mode                      = var.patch_mode
-  priority                        = var.priority
-  zone                            = var.zone
-  patch_assessment_mode           = var.patch_assessment_mode
-  source_image_id                 = var.source_image_id
-  computer_name                   = var.host_name
-  provision_vm_agent              = var.provision_vm_agent
-  network_interface_ids           = var.network_interface_ids
+  # custom_data                     = var.custom_data
+  custom_data                = try(filebase64(var.custom_data), base64encode(var.custom_data), null)
+  user_data                  = var.user_data
+  edge_zone                  = var.edge_zone
+  encryption_at_host_enabled = var.encryption_at_host_enabled
+  patch_mode                 = var.patch_mode
+  priority                   = var.priority
+  zone                       = var.zone
+  patch_assessment_mode      = var.patch_assessment_mode
+  source_image_id            = var.source_image_id
+  computer_name              = var.host_name
+  provision_vm_agent         = var.provision_vm_agent
+  network_interface_ids      = var.network_interface_ids
 
   dynamic "admin_ssh_key" {
     for_each = var.disable_password_authentication == true ? [1] : []
@@ -36,7 +37,7 @@ resource "azurerm_linux_virtual_machine" "vml" {
   }
 
   dynamic "plan" {
-    for_each = var.is_image_from_marketplace == true ? [1] : []
+    for_each = var.is_plan_exists == true ? [1] : []
     content {
       name      = var.plan_name
       publisher = var.plan_publisher
@@ -45,7 +46,7 @@ resource "azurerm_linux_virtual_machine" "vml" {
   }
 
   dynamic "source_image_reference" {
-    for_each = var.source_image_id == null ? [1] : []
+    for_each = var.source_image_id == null && var.is_image_from_marketplace == true ? [1] : []
     content {
       publisher = var.content_publisher #"Canonical"
       offer     = var.content_offer     #"UbuntuServer"
@@ -60,5 +61,17 @@ resource "azurerm_linux_virtual_machine" "vml" {
       storage_account_uri = var.storage_account_uri
     }
   }
+
+  dynamic "identity" {
+    for_each = var.is_identity_required == true ? [1] : []
+    content {
+      type         = var.msi_type
+      identity_ids = var.identity_ids
+    }
+  }
   tags = var.tags
+
+  lifecycle {
+    ignore_changes = [identity, tags]
+  }
 }

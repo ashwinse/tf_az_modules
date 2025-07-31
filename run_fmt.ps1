@@ -1,5 +1,5 @@
 $x=Get-ChildItem -directory -Name -Exclude .*
-$absPath="F:\github_repos\tf_az_base_modules\"
+$absPath="C:\github-repos\tf_az_base_modules\"
 foreach ($i in $x)
 {
     set-location $absPath$i

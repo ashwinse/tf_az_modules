@@ -1,0 +1,10 @@
+variable "name" {}
+variable "resource_group_name" {}
+variable "location" {}
+variable "sku_name" {}
+variable "sku_tier" {}
+variable "firewall_policy_id" {}
+variable "zones" {}
+variable "ip_config" {}
+variable "tags" {}
+variable "subscription_id" {}

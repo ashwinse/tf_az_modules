@@ -1,0 +1,13 @@
+variable "name" {}
+variable "location" {}
+variable "resource_group_name" {}
+variable "virtual_network_name" {}
+variable "subnet_id" {}
+variable "private_connection_resource_id" {}
+variable "is_manual_connection" {}
+variable "subresource_names" {}
+variable "request_message" {}
+variable "ip_configurations" {}
+variable "private_dns_zone_group" {}
+variable "custom_network_interface_name" {}
+variable "tags" {}

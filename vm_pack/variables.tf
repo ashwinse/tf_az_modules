@@ -70,6 +70,10 @@ variable "custom_data" {
 variable "source_image_id" {
   default = null
 }
+variable "is_plan_exists" {
+  default = null
+  type    = bool
+}
 variable "os_disk_name" {
   default = null
 }
@@ -84,6 +88,7 @@ variable "disk_size_gb" {
 }
 variable "is_image_from_marketplace" {
   default = null
+  type    = bool
 }
 variable "plan_name" {
   default = null
@@ -108,6 +113,7 @@ variable "content_version" {
 }
 variable "is_boot_diagnostics_required" {
   default = null
+  type    = bool
 }
 variable "storage_uri" {
   default = null
@@ -127,3 +133,26 @@ variable "managed_disks" {
 variable "data_source_looper" {
   default = null
 }
+
+variable "is_identity_required" {
+  default = null
+  type    = bool
+}
+
+variable "msi_type" {
+  default = null # 'SystemAssigned', 'UserAssigned', 'SystemAssigned, UserAssigned'
+}
+
+variable "identity_ids" {
+  default = null
+  type    = list(string)
+}
+
+variable "vm_extensions" {
+  default = null
+}
+variable "subscription_id" {
+  default = null
+}
+
+

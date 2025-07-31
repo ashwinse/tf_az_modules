@@ -27,3 +27,6 @@ variable "is_ddos_protection_plan_enable" {
 variable "ddos_protection_plan_id" {
   default = null
 }
+variable "dns_servers" {
+  default = null
+}

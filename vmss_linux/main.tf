@@ -6,14 +6,14 @@ data "azurerm_subnet" "subnet" {
 }
 
 resource "azurerm_linux_virtual_machine_scale_set" "vmssl" {
-  depends_on          = [data.azurerm_subnet.subnet]
-  name                = var.name
-  resource_group_name = var.resource_group_name
-  location            = var.location
-  sku                 = var.sku
-  instances           = var.instances
-  admin_password      = var.admin_password
-  admin_username      = var.admin_username
+  depends_on                      = [data.azurerm_subnet.subnet]
+  name                            = var.name
+  resource_group_name             = var.resource_group_name
+  location                        = var.location
+  sku                             = var.sku
+  instances                       = var.instances
+  admin_password                  = var.admin_password
+  admin_username                  = var.admin_username
   disable_password_authentication = var.disable_password_authentication
   dynamic "admin_ssh_key" {
     for_each = var.disable_password_authentication == true ? [1] : []
@@ -46,7 +46,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmssl" {
   }
   capacity_reservation_group_id = (var.proximity_placement_group_id == null && var.single_placement_group == false) ? var.capacity_reservation_group_id : null
   computer_name_prefix          = var.computer_name_prefix
-  custom_data                   = var.custom_data
+  custom_data                   = try(filebase64(var.custom_data), base64encode(var.custom_data), null)
 
   dynamic "data_disk" {
     for_each = var.is_data_disk_required == true ? [
@@ -92,10 +92,10 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmssl" {
     }
 
   }
-  
+
   overprovision = var.overprovision
   dynamic "plan" {
-    for_each = var.is_image_from_marketplace == true ? [1] : []
+    for_each = var.is_plan_exists == true ? [1] : []
     content {
       name      = var.plan_name
       publisher = var.plan_publisher
@@ -128,7 +128,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmssl" {
   single_placement_group = var.single_placement_group # true
   source_image_id        = var.source_image_id
   dynamic "source_image_reference" {
-    for_each = var.source_image_id == null ? [1] : []
+    for_each = var.source_image_id == null && is_image_from_marketplace == true ? [1] : []
     content {
       publisher = var.content_publisher # "MicrosoftWindowsServer"
       offer     = var.content_offer     # "WindowsServer"

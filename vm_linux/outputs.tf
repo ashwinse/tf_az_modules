@@ -18,3 +18,11 @@ output "public_ip_addresses" {
 output "private_ip_addresses" {
   value = azurerm_linux_virtual_machine.vml.private_ip_addresses
 }
+
+output "tags" {
+  value = azurerm_linux_virtual_machine.vml.tags
+}
+
+output "identity" {
+  value = azurerm_linux_virtual_machine.vml.identity
+}

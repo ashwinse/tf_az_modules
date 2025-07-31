@@ -27,3 +27,11 @@ output "admin_password" {
   sensitive = true
   value     = azurerm_windows_virtual_machine.vmw.admin_password
 }
+
+output "tags" {
+  value = azurerm_windows_virtual_machine.vmw.tags
+}
+
+output "identity" {
+  value = azurerm_windows_virtual_machine.vmw.identity
+}

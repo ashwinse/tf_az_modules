@@ -1,7 +1,7 @@
 output "id" {
-  value = azurerm_key_vault.kv.id
+  value = azurerm_key_vault.keyvault.id
 }
 
 output "vault_uri" {
-  value = azurerm_key_vault.kv.vault_uri
+  value = azurerm_key_vault.keyvault.vault_uri
 }

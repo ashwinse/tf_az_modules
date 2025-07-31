@@ -6,7 +6,6 @@ resource "azurerm_virtual_machine" "vm" {
   resource_group_name   = var.resource_group_name
   network_interface_ids = var.network_interface_ids
   vm_size               = var.size
-  custom_data           = var.custom_data
 
   # Uncomment this line to delete the OS disk automatically when deleting the VM
   delete_os_disk_on_termination = var.delete_os_disk_on_termination
@@ -99,7 +98,7 @@ resource "azurerm_virtual_machine" "vm" {
     for_each = var.is_boot_diagnostics_required == true ? [1] : []
     content {
       enabled     = var.is_boot_diagnostics_required == true ? "1" : "0"
-      storage_uri = var.storage_uri
+      storage_uri = var.boot_diagnostics_storage_uri
     }
   }
 }

@@ -109,6 +109,10 @@ variable "overprovision" {
 variable "is_image_from_marketplace" {
   default = false
 }
+variable "is_plan_exists" {
+  default = null
+  type    = bool
+}
 variable "plan_name" {
   default = null
 }

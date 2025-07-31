@@ -3,9 +3,7 @@ variable "resource_group_name" {}
 variable "location" {}
 variable "size" {}           # "Standard_F2"
 variable "admin_username" {} # "adminuser"
-variable "custom_data" {
-  default = null
-}
+
 variable "disable_password_authentication" {
   default = null
 }

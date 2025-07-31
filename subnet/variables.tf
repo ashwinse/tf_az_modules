@@ -5,7 +5,7 @@ variable "virtual_network_name" {}
 variable "address_prefixes" {
   type = list(any)
 }
-variable "private_endpoint_network_policies_enabled" {
+variable "private_endpoint_network_policies" {
   default = null
 }
 variable "private_link_service_network_policies_enabled" {

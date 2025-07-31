@@ -39,7 +39,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmssw" {
   }
   capacity_reservation_group_id = (var.proximity_placement_group_id == null && var.single_placement_group == false) ? var.capacity_reservation_group_id : null
   computer_name_prefix          = var.computer_name_prefix
-  custom_data                   = var.custom_data
+  custom_data                   = try(filebase64(var.custom_data), base64encode(var.custom_data), null)
 
   dynamic "data_disk" {
     for_each = var.is_data_disk_required == true ? [
@@ -88,8 +88,9 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmssw" {
   }
   license_type  = var.license_type # None, Windows_Client and Windows_Server
   overprovision = var.overprovision
+
   dynamic "plan" {
-    for_each = var.is_image_from_marketplace == true ? [1] : []
+    for_each = var.is_plan_exists == true ? [1] : []
     content {
       name      = var.plan_name
       publisher = var.plan_publisher
@@ -122,7 +123,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmssw" {
   single_placement_group = var.single_placement_group # true
   source_image_id        = var.source_image_id
   dynamic "source_image_reference" {
-    for_each = var.source_image_id == null ? [1] : []
+    for_each = var.source_image_id == null && var.is_image_from_marketplace == true ? [1] : []
     content {
       publisher = var.content_publisher # "MicrosoftWindowsServer"
       offer     = var.content_offer     # "WindowsServer"

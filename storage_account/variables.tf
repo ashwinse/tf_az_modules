@@ -20,6 +20,9 @@ variable "enable_https_traffic_only" {
 variable "cross_tenant_replication_enabled" {
   default = null
 }
+variable "azure_files_authentication" {
+  default = null
+}
 variable "edge_zone" {
   default = null
 }
@@ -256,3 +259,5 @@ variable "identity_ids" {
   default = null
   type    = list(any)
 }
+variable "network_rules" {}
+variable "configurations" {}

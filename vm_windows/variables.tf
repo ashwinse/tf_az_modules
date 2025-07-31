@@ -5,6 +5,10 @@ variable "size" {}           # "Standard_F2"
 variable "admin_username" {} # "adminuser"
 variable "admin_password" {} # "P@$$w0rd1234!"
 variable "host_name" {}
+variable "is_plan_exists" {
+  default = null
+  type    = bool
+}
 variable "enable_automatic_updates" {
   default = null
 }
@@ -32,6 +36,9 @@ variable "timezone" {
 variable "patch_mode" {
   default = null
 } # Manual, AutomaticByOS and AutomaticByPlatform
+variable "patch_assessment_mode" {
+  default = null
+}
 variable "availability_set_id" {
   default = null
 }
@@ -69,7 +76,7 @@ variable "content_version" {
 } # "latest"
 
 variable "tags" {
-  type = map(any)
+  default = null
 }
 variable "is_image_from_marketplace" {
   default = false
@@ -89,4 +96,18 @@ variable "is_boot_diagnostics_required" {
 }
 variable "storage_uri" {
   default = null
+}
+
+variable "is_identity_required" {
+  default = null
+  type    = bool
+}
+
+variable "msi_type" {
+  default = null # 'SystemAssigned', 'UserAssigned', 'SystemAssigned, UserAssigned'
+}
+
+variable "identity_ids" {
+  default = null
+  type    = list(string)
 }

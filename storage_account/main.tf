@@ -8,14 +8,14 @@ locals {
 }
 
 resource "azurerm_storage_account" "sa" {
-  name                              = var.name
-  resource_group_name               = var.resource_group_name
-  location                          = var.location
-  account_kind                      = var.account_kind
-  account_tier                      = var.account_tier
-  account_replication_type          = var.account_replication_type
-  access_tier                       = var.access_tier
-  enable_https_traffic_only         = var.enable_https_traffic_only
+  name                     = var.name
+  resource_group_name      = var.resource_group_name
+  location                 = var.location
+  account_kind             = var.account_kind
+  account_tier             = var.account_tier
+  account_replication_type = var.account_replication_type
+  access_tier              = var.access_tier
+  # enable_https_traffic_only         = var.enable_https_traffic_only
   allow_nested_items_to_be_public   = var.allow_nested_items_to_be_public
   min_tls_version                   = var.min_tls_version
   tags                              = var.tags
@@ -31,6 +31,23 @@ resource "azurerm_storage_account" "sa" {
   infrastructure_encryption_enabled = local.infrastructure_encryption_enabled
   allowed_copy_scope                = var.allowed_copy_scope
   sftp_enabled                      = local.sftp_enabled ## is true only when is_hns_enabled is true
+  dynamic "azure_files_authentication" {
+    for_each = try(var.azure_files_authentication, null) != null ? var.azure_files_authentication : {}
+    content {
+      directory_type = var.azure_files_authentication.directory_type
+      dynamic "active_directory" {
+        for_each = try(var.azure_files_authentication.active_directory, null) != null ? var.azure_files_authentication.active_directory : {}
+        content {
+          storage_sid         = var.azure_files_authentication.active_directory.storage_sid
+          domain_name         = var.azure_files_authentication.active_directory.domain_name
+          domain_guid         = var.azure_files_authentication.active_directory.domain_guid
+          domain_sid          = var.azure_files_authentication.active_directory.domain_sid
+          forest_name         = var.azure_files_authentication.active_directory.forest_name
+          netbios_domain_name = var.azure_files_authentication.active_directory.netbios_domain_name
+        }
+      }
+    }
+  }
   dynamic "immutability_policy" {
     for_each = var.is_immutability_policy_req == true ? [1] : []
     content {
@@ -68,39 +85,40 @@ resource "azurerm_storage_account" "sa" {
     }
   }
   dynamic "blob_properties" {
-    for_each = var.is_blob_properties_req == true ? [1] : []
+    for_each = try(var.configurations.blob_properties, null) != null ? var.configurations.blob_properties : {}
     content {
-      versioning_enabled            = var.blob_versioning_enabled
-      change_feed_enabled           = var.blob_change_feed_enabled
-      change_feed_retention_in_days = var.blob_change_feed_retention_in_days
-      last_access_time_enabled      = var.blob_last_access_time_enabled
-      default_service_version       = var.blob_default_service_version
+      versioning_enabled            = try(blob_properties.value.versioning_enabled, null)
+      change_feed_enabled           = try(blob_properties.value.change_feed_enabled, null)
+      change_feed_retention_in_days = try(blob_properties.value.change_feed_retention_in_days, null)
+      last_access_time_enabled      = try(blob_properties.value.last_access_time_enabled, null)
+      default_service_version       = try(blob_properties.value.default_service_version, null)
       dynamic "delete_retention_policy" {
-        for_each = var.is_delete_retention_policy_req_blob == true ? [1] : []
+        for_each = try(blob_properties.value.delete_retention_policy, null) != null ? [1] : []
         content {
-          days = var.delete_retention_policy_days_blob
+          days = blob_properties.value.delete_retention_policy.days
+          # permanent_delete_enabled = try(blob_properties.value.delete_retention_policy.permanent_delete_enabled, null)
         }
       }
       dynamic "restore_policy" {
-        for_each = var.is_restore_policy_req_blob == true ? [1] : []
+        for_each = try(blob_properties.value.restore_policy, null) != null ? [1] : []
         content {
-          days = var.restore_policy_days_blob
+          days = blob_properties.value.restore_policy.days
         }
       }
       dynamic "container_delete_retention_policy" {
-        for_each = var.is_container_delete_retention_policy_req_blob == true ? [1] : []
+        for_each = try(blob_properties.value.container_delete_retention_policy, null) != null ? [1] : []
         content {
-          days = var.container_delete_retention_policy_days_blob
+          days = blob_properties.value.container_delete_retention_policy.days
         }
       }
       dynamic "cors_rule" {
-        for_each = var.is_cors_rule_req_blob == true ? [1] : []
+        for_each = try(blob_properties.value.cors_rule, null) != null ? [1] : []
         content {
-          allowed_headers    = var.allowed_headers
-          allowed_methods    = var.allowed_methods
-          allowed_origins    = var.allowed_origins
-          exposed_headers    = var.exposed_headers
-          max_age_in_seconds = var.max_age_in_seconds
+          allowed_headers    = blob_properties.value.cors_rule.allowed_headers
+          allowed_methods    = blob_properties.value.cors_rule.allowed_methods
+          allowed_origins    = blob_properties.value.cors_rule.allowed_origins
+          exposed_headers    = blob_properties.value.cors_rule.exposed_headers
+          max_age_in_seconds = blob_properties.value.cors_rule.max_age_in_seconds
         }
       }
     }
@@ -170,6 +188,22 @@ resource "azurerm_storage_account" "sa" {
     content {
       type         = var.identity_type
       identity_ids = var.identity_ids
+    }
+  }
+  dynamic "network_rules" {
+    for_each = try(var.network_rules, null) != null ? var.network_rules : {}
+    content {
+      default_action             = network_rules.value.default_action
+      bypass                     = try(network_rules.value.bypass, [])
+      ip_rules                   = try(network_rules.value.ip_rules, null)
+      virtual_network_subnet_ids = try(network_rules.value.virtual_network_subnet_ids, null)
+      dynamic "private_link_access" {
+        for_each = try(network_rules.value.private_link_access, null) != null ? network_rules.value.private_link_access : {}
+        content {
+          endpoint_resource_id = private_link_access.value.endpoint_resource_id
+          endpoint_tenant_id   = try(private_link_access.value.endpoint_tenant_id, null)
+        }
+      }
     }
   }
 

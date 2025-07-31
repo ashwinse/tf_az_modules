@@ -3,6 +3,10 @@ variable "resource_group_name" {}
 variable "location" {}
 variable "size" {}           # "Standard_F2"
 variable "admin_username" {} # "adminuser"
+variable "is_plan_exists" {
+  default = null
+  type    = bool
+}
 variable "user_data" {
   default = null
 }
@@ -76,6 +80,7 @@ variable "tags" {
 
 variable "is_image_from_marketplace" {
   default = false
+  type    = bool
 } # true or false
 variable "plan_name" {
   default = null
@@ -89,8 +94,23 @@ variable "plan_product" {
 
 variable "is_boot_diagnostics_required" {
   default = false
+  type    = bool
 }
 
 variable "storage_account_uri" {
   default = null
+}
+
+variable "is_identity_required" {
+  default = null
+  type    = bool
+}
+
+variable "msi_type" {
+  default = null # 'SystemAssigned', 'UserAssigned', 'SystemAssigned, UserAssigned'
+}
+
+variable "identity_ids" {
+  default = null
+  type    = list(string)
 }

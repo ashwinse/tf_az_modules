@@ -7,6 +7,9 @@ variable "admin_enabled" {}
 variable "is_georeplications_required" {
   type = bool
 }
+variable "tags" {
+  type = map(any)
+}
 variable "georeplications_settings" {
   default = null
 } # Example below

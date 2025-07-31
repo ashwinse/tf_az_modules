@@ -1,0 +1,9 @@
+variable "name" {}
+variable "location" {}
+variable "resource_group_name" {}
+variable "sku" {}
+variable "tags" {}
+variable "auto_learn_private_ranges_enabled" {}
+variable "dns" {}
+variable "intrusion_detection_mode" {}
+variable "insights" {}

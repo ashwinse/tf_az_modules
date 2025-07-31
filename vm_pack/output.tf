@@ -13,3 +13,6 @@ output "nic_ids" {
 output "md_ids" {
   value = try(module.md, null)
 }
+output "principal_ids" {
+  value = try(module.vmw[0].*.identity[0], module.vml[0].*.identity[0])
+}

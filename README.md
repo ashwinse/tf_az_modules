@@ -1,69 +1,55 @@
-## Custom Terraform Base modules made for Azure provider
-### Status: InProgress
+<!-- BEGIN_TF_DOCS -->
+## Requirements
 
-### Usage
+| Name | Version |
+|------|---------|
+| <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) | ~>2.41.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | ~>3.52.0 |
 
-~~~
-module "rg" {
-  source   = "git::https://github.com/onxpress/tf_az_base_modules.git//resource_group?ref=main"
-  name     = "${var.prefix}-rg"
-  location = var.location
-  tags     = var.tags
-}
+## Providers
 
-module "vnet" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//vnet?ref=main"
-  name                = "${var.prefix}-vnet"
-  location            = module.rg.location
-  resource_group_name = module.rg.name
-  tags                = var.tags
-  address_space       = ["10.11.0.0/16"]
-}
-~~~
+| Name | Version |
+|------|---------|
+| <a name="provider_azuread"></a> [azuread](#provider\_azuread) | 2.41.0 |
 
-#### LOOPING through Terraform Modules
+## Modules
 
-~~~
-module "subnet" {
-  source               = "git::https://github.com/onxpress/tf_az_base_modules.git//subnet?ref=main"
-  count                = 2
-  name                 = "${var.prefix}-subnet${count.index + 1}"
-  resource_group_name  = module.rg.name
-  virtual_network_name = module.vnet.name
-  address_prefixes     = ["10.11.${count.index + 1}.0/24"]
-  # private_endpoint_network_policies_enabled = true
-  # private_link_service_network_policies_enabled = true
-  # service_endpoints = ["Microsoft.ContainerRegistry", "Microsoft.Sql"]
-  # is_delegation = true
-  # delegation_name = "delegation"
-  # service_delegation_name = "Microsoft.Sql/managedInstances"
-}
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_application_registration"></a> [application\_registration](#module\_application\_registration) | ./azuread/applications_v1 | n/a |
+| <a name="module_keyvault"></a> [keyvault](#module\_keyvault) | ./key_vault | n/a |
+| <a name="module_keyvault_accesspolicy"></a> [keyvault\_accesspolicy](#module\_keyvault\_accesspolicy) | ./key_vault_access_policies | n/a |
+| <a name="module_rg"></a> [rg](#module\_rg) | ./resource_group | n/a |
+| <a name="module_service_principal"></a> [service\_principal](#module\_service\_principal) | ./azuread/service_principal | n/a |
+| <a name="module_service_principal_password"></a> [service\_principal\_password](#module\_service\_principal\_password) | ./azuread/service_principal_password | n/a |
 
+## Resources
 
-locals {
-  name                       = ["RDP", "SSH"]
-  direction                  = ["Inbound", "Outbound"]
-  access                     = ["Allow", "Deny"]
-  protocol                   = ["Tcp", "Udp"]
-  source_port_range          = ["*", "22"]
-  destination_port_range     = ["3389", "22"]
-  source_address_prefix      = ["*", "10.0.0.0/24"]
-  destination_address_prefix = ["10.0.0.0/24", "*"]
-}
+| Name | Type |
+|------|------|
+| [azuread_client_config.current](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs/data-sources/client_config) | data source |
 
-module "nsr" {
-  source                      = "git::https://github.com/onxpress/tf_az_base_modules.git//nsr?ref=main"
-  count                       = 2
-  name                        = element(local.name, count.index)
-  priority                    = "20${count.index + 1}"
-  direction                   = element(local.direction, count.index)
-  access                      = element(local.access, count.index)
-  protocol                    = element(local.protocol, count.index)
-  source_port_range           = element(local.source_port_range, count.index)
-  destination_port_range      = element(local.destination_port_range, count.index)
-  source_address_prefix       = element(local.source_address_prefix, count.index)
-  destination_address_prefix  = element(local.destination_address_prefix, count.index)
-  resource_group_name         = module.rg.name
-  network_security_group_name = module.nsg.name
-}
-~~~
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_app_registration"></a> [app\_registration](#input\_app\_registration) | Az AD object App registration | <pre>map(object({<br>    display_name = string<br>    owners = optional(list(string))<br>  }))</pre> | `{}` | no |
+| <a name="input_avsets"></a> [avsets](#input\_avsets) | n/a | <pre>map(object({<br>    name                        = string<br>    location                    = optional(string)<br>    resource_group_name         = optional(string)<br>    managed                     = optional(bool, true)<br>    platform_fault_domain_count = optional(number, 2)<br>  }))</pre> | `{}` | no |
+| <a name="input_client_config"></a> [client\_config](#input\_client\_config) | n/a | `map` | `{}` | no |
+| <a name="input_data_sources"></a> [data\_sources](#input\_data\_sources) | Data gathering for resources not managed by CAF Module | `map` | `{}` | no |
+| <a name="input_key_vault_access_policies"></a> [key\_vault\_access\_policies](#input\_key\_vault\_access\_policies) | n/a | <pre>map(object({<br>    key_vault_name          = string<br>    key_permissions         = optional(list(string))<br>    secret_permissions      = optional(list(string))<br>    certificate_permissions = optional(list(string)) <br>  }))</pre> | n/a | yes |
+| <a name="input_key_vaults"></a> [key\_vaults](#input\_key\_vaults) | n/a | <pre>map(object({<br>  name                   = string<br>  location               = string<br>  resource_group_name    = string<br>  enabled_for_disk_encryption = optional(bool)<br>  enabled_for_deployment = optional(bool)<br>  enabled_for_template_deployment = optional(bool)<br>  enable_rbac_authorization = optional(bool)<br>  purge_protection_enabled = optional(bool)<br>  public_network_access_enabled = optional(bool)<br>  soft_delete_retention_days = optional(number)<br>  tags                   = optional(map(any))<br>  sku_name               = optional(string,"standard")<br>  }))</pre> | `{}` | no |
+| <a name="input_public_ip"></a> [public\_ip](#input\_public\_ip) | n/a | <pre>map(object({<br>    name                = string<br>    location            = optional(string)<br>    resource_group_name = optional(string)<br>    allocation_method   = string<br>    domain_name_label   = optional(string)<br>    tags                = optional(map(any))<br>  }))</pre> | `{}` | no |
+| <a name="input_resource_groups"></a> [resource\_groups](#input\_resource\_groups) | Resource Group | <pre>map(object({<br>        name                = string<br>        location            = string<br>        tags = optional(map(any)) <br>    }))</pre> | `{}` | no |
+| <a name="input_service_principal"></a> [service\_principal](#input\_service\_principal) | Az AD object Service Principal | <pre>map(object({<br>    application_name = string<br>    owners = optional(list(string))<br>    app_role_assignment_required = optional(bool)<br>    tags = optional(map(string))<br>  }))</pre> | `{}` | no |
+| <a name="input_service_principal_password"></a> [service\_principal\_password](#input\_service\_principal\_password) | Az AD object Service Principal Password | <pre>map(object({<br>    application_name = string<br>    service_principal_name = string<br>    secret_prefix = optional(string)<br>    keyvault_name = optional(string)<br>  }))</pre> | `{}` | no |
+| <a name="input_subnets"></a> [subnets](#input\_subnets) | n/a | <pre>map(object({<br>    name                 = string<br>    resource_group_name  = optional(string)<br>    virtual_network_name = optional(string)<br>    service_endpoints    = optional(list(string))<br>    address_prefixes     = list(string)<br>    tags                 = optional(map(any))<br>  }))</pre> | `{}` | no |
+| <a name="input_vms"></a> [vms](#input\_vms) | ##################### VMS ########################### | <pre>map(object({<br>    name                            = string<br>    location                        = optional(string)<br>    resource_group_name             = optional(string)<br>    os_type                         = string<br>    size                            = string<br>    admin_username                  = string<br>    admin_password                  = string<br>    disable_password_authentication = optional(bool, false)<br>    availability_set_id             = optional(string)<br>    content_publisher               = optional(string)<br>    content_offer                   = optional(string)<br>    content_sku                     = optional(string)<br>    content_version                 = optional(string)<br>    edge_zone                       = optional(string)<br>    disk_size_gb                    = optional(number)<br>    host_name                       = optional(string)<br>    zone                            = optional(string)<br>    encryption_at_host_enabled      = optional(bool)<br>    hotpatching_enabled             = optional(bool)<br>    priority                        = optional(string)<br>    timezone                        = optional(string)<br>    user_data                       = optional(string)<br>    computer_name                   = optional(string)<br>    enable_automatic_updates        = optional(bool)<br>    provision_vm_agent              = optional(bool)<br>    network_interface_ids = map(object({<br>      nic_name                      = string<br>      enable_ip_forwarding          = optional(string)<br>      enable_accelerated_networking = optional(string)<br>      ip_configuration_name         = string<br>      private_ip_address_allocation = string<br>      private_ip_address            = optional(string)<br>      subnet_id                     = optional(string)<br>      virtual_network_name          = optional(string)<br>      public_ip_address_id          = optional(string)<br>      tags                          = optional(map(any))<br>      is_subnet_existing            = optional(bool, true)<br>      is_public_ip_existing         = optional(bool, false)<br>    }))<br>    managed_disks = optional(map(object({<br>      name                      = string<br>      storage_account_type      = string<br>      create_option             = string<br>      disk_size_gb              = optional(number)<br>      os_type                   = optional(string)<br>      max_shares                = optional(number)<br>      tags                      = optional(map(any))<br>      lun                       = string<br>      caching                   = string<br>      write_accelerator_enabled = optional(string)<br>      storage_account_id        = optional(string)<br>      source_uri                = optional(string)<br>      source_resource_id        = optional(string)<br>      image_reference_id        = optional(string)<br>    })), {})<br>    patch_mode                   = optional(string)<br>    custom_data                  = optional(string)<br>    source_image_id              = optional(string)<br>    storage_account_type         = optional(string)<br>    os_disk_name                 = optional(string)<br>    os_disk_caching              = optional(string)<br>    is_image_from_marketplace    = optional(bool, false)<br>    plan                         = optional(map(any))<br>    source_image_reference       = optional(map(any))<br>    is_boot_diagnostics_required = optional(bool, false)<br>    storage_uri                  = optional(string)<br>    tags                         = optional(map(any))<br>  }))</pre> | `{}` | no |
+| <a name="input_vmss"></a> [vmss](#input\_vmss) | n/a | <pre>map(object({<br>    name                                   = string<br>    resource_group_name                    = optional(string)<br>    location                               = optional(string)<br>    sku                                    = string<br>    instances                              = string<br>    admin_password                         = string<br>    admin_username                         = string<br>    disable_password_authentication        = optional(bool, false)<br>    public_key                             = optional(string)<br>    automatic_instance_repair_enabled      = optional(bool)<br>    automatic_instance_repair_grace_period = optional(string)<br>    is_automatic_os_upgrade_policy         = optional(bool, false)<br>    disable_automatic_rollback             = optional(string)<br>    enable_automatic_os_upgrade            = optional(string)<br>    boot_diagnostics_storage_account_uri   = optional(string)<br>    capacity_reservation_group_id          = optional(string)<br>    custom_data                            = optional(string)<br>    computer_name_prefix                   = optional(string)<br>    is_data_disk_required                  = optional(bool, false)<br>    data_disk_settings = optional(list(object({<br>      name                      = string<br>      caching                   = optional(string, "ReadWrite")<br>      create_option             = optional(string, "Empty")<br>      disk_size_gb              = optional(string)<br>      storage_account_type      = optional(string)<br>      lun                       = optional(string)<br>      disk_encryption_set_id    = optional(string)<br>      write_accelerator_enabled = optional(bool, false)<br>    })), [])<br>    edge_zone                                    = optional(string)<br>    enable_automatic_updates                     = optional(string)<br>    encryption_at_host_enabled                   = optional(bool, false)<br>    eviction_policy                              = optional(string)<br>    is_gallery_application                       = optional(bool, false)<br>    gallery_application_version_id               = optional(string)<br>    gallery_application_configuration_blob_uri   = optional(string)<br>    gallery_application_order                    = optional(string)<br>    health_probe_id                              = optional(string)<br>    host_group_id                                = optional(string)<br>    is_identity                                  = optional(bool, false)<br>    license_type                                 = optional(string)<br>    overprovision                                = optional(string)<br>    identity_type                                = optional(string)<br>    identity_ids                                 = optional(string)<br>    overprovision                                = optional(string)<br>    is_image_from_marketplace                    = optional(bool, false)<br>    plan_name                                    = optional(string)<br>    plan_publisher                               = optional(string)<br>    plan_product                                 = optional(string)<br>    platform_fault_domain_count                  = optional(string)<br>    priority                                     = optional(string)<br>    provision_vm_agent                           = optional(string)<br>    proximity_placement_group_id                 = optional(string)<br>    max_batch_instance_percent                   = optional(string)<br>    max_unhealthy_instance_percent               = optional(string)<br>    max_unhealthy_upgraded_instance_percent      = optional(string)<br>    pause_time_between_batches                   = optional(string)<br>    rolling_upgrade_policy                       = optional(string)<br>    is_scale_in                                  = optional(bool, false)<br>    scale_in_rule                                = optional(string)<br>    scale_in_force_deletion_enabled              = optional(bool, false)<br>    secure_boot_enabled                          = optional(bool, false)<br>    single_placement_group                       = optional(string)<br>    source_image_id                              = optional(string)<br>    content_publisher                            = optional(string)<br>    content_offer                                = optional(string)<br>    content_sku                                  = optional(string)<br>    content_version                              = optional(string)<br>    spot_restore_enabled                         = optional(bool, false)<br>    spot_restore_timeout                         = optional(string)<br>    termination_notification_enabled             = optional(bool, false)<br>    termination_notification_timeout             = optional(string)<br>    timezone                                     = optional(string)<br>    upgrade_mode                                 = optional(string)<br>    user_data                                    = optional(string)<br>    vtpm_enabled                                 = optional(bool)<br>    zone_balance                                 = optional(string)<br>    zones                                        = optional(string)<br>    os_disk_caching                              = optional(string)<br>    storage_account_type                         = optional(string)<br>    disk_size_gb                                 = optional(string)<br>    write_accelerator_enabled                    = optional(bool)<br>    security_encryption_type                     = optional(string)<br>    secure_vm_disk_encryption_set_id             = optional(string)<br>    network_interface_name                       = string<br>    dns_servers                                  = optional(string)<br>    enable_accelerated_networking                = optional(string)<br>    enable_ip_forwarding                         = optional(string)<br>    network_security_group_id                    = optional(string)<br>    application_gateway_backend_address_pool_ids = optional(list(string))<br>    application_security_group_ids               = optional(list(string))<br>    load_balancer_backend_address_pool_ids       = optional(list(string))<br>    load_balancer_inbound_nat_rules_ids          = optional(list(string))<br>    ip_configuration_version                     = optional(string, "IPv4")<br>    subnet_id                                    = optional(string)<br>    is_public_ip_address                         = optional(bool, false)<br>    public_ip_address_name                       = optional(string)<br>    public_ip_address_domain_name_label          = optional(string)<br>    public_ip_address_idle_timeout_in_minutes    = optional(string)<br>    is_additional_nic_required                   = optional(bool, false)<br>    subnet_info = optional(map(object({<br>      name                 = optional(string)<br>      virtual_network_name = optional(string)<br>      resource_group_name  = optional(string)<br>    })), {})<br>    additional_nic_settings = optional(list(object({<br>      name                                         = string<br>      primary                                      = optional(bool, false)<br>      dns_servers                                  = optional(list(string))<br>      enable_accelerated_networking                = optional(string)<br>      enable_ip_forwarding                         = optional(string)<br>      network_security_group_id                    = optional(string)<br>      subnet_id                                    = optional(string)<br>      application_gateway_backend_address_pool_ids = optional(list(string))<br>      application_security_group_ids               = optional(list(string))<br>      load_balancer_backend_address_pool_ids       = optional(list(string))<br>      load_balancer_inbound_nat_rules_ids          = optional(list(string))<br>      version                                      = optional(string)<br>      ip_configuration_name                        = optional(string)<br>      is_public_ip_address                         = optional(bool, false)<br>      public_ip_address_name                       = optional(string)<br>      public_ip_address_domain_name_label          = optional(string)<br>      public_ip_address_idle_timeout_in_minutes    = optional(string)<br>    })), [])<br>    tags = optional(map(any))<br>  }))</pre> | `{}` | no |
+| <a name="input_vnet"></a> [vnet](#input\_vnet) | ##################### VIRTUAL NETWORK ########################### | <pre>map(object({<br>    name                = string<br>    location            = optional(string)<br>    resource_group_name = optional(string)<br>    address_space       = list(string)<br>    tags                = optional(map(any))<br>  }))</pre> | `{}` | no |
+
+## Outputs
+
+No outputs.
+
+<!-- END_TF_DOCS -->

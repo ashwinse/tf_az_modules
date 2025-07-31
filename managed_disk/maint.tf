@@ -12,4 +12,8 @@ resource "azurerm_managed_disk" "md" {
   storage_account_id   = var.storage_account_id
   max_shares           = var.max_shares
   tags                 = var.tags
+
+  lifecycle {
+    ignore_changes = [tags]
+  }
 }
