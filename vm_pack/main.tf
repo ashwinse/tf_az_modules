@@ -1,5 +1,5 @@
 # module "data_source" {
-#   source                        = "git::https://github.com/onxpress/tf_az_base_modules.git//data_source?ref=v0.0.9"
+#   source                        = "git::https://github.com/ashwinse/tf_az_modules.git//data_source?ref=v0.0.9"
 #   for_each                      = var.data_source_looper
 #   is_vnet_existing              = try(each.value.is_vnet_existing, false)
 #   is_subnet_existing            = try(each.value.is_subnet_existing, false)
@@ -14,7 +14,7 @@
 
 
 module "nic" {
-  source                        = "git::https://github.com/onxpress/tf_az_base_modules.git//network_interface?ref=v0.0.17"
+  source                        = "git::https://github.com/ashwinse/tf_az_modules.git//network_interface?ref=v0.0.17"
   for_each                      = var.network_interface_ids
   name                          = each.value.nic_name
   location                      = var.location
@@ -35,7 +35,7 @@ module "nic" {
 
 
 module "vmw" {
-  source                       = "git::https://github.com/onxpress/tf_az_base_modules.git//vm_windows?ref=v0.0.17"
+  source                       = "git::https://github.com/ashwinse/tf_az_modules.git//vm_windows?ref=v0.0.17"
   depends_on                   = [module.nic]
   count                        = var.os_type == "Windows" ? 1 : 0
   name                         = var.vm_name
@@ -83,7 +83,7 @@ module "vmw" {
 
 
 module "vml" {
-  source                          = "git::https://github.com/onxpress/tf_az_base_modules.git//vm_linux?ref=v0.0.17"
+  source                          = "git::https://github.com/ashwinse/tf_az_modules.git//vm_linux?ref=v0.0.17"
   depends_on                      = [module.nic]
   count                           = var.os_type == "Linux" ? 1 : 0
   name                            = var.vm_name
@@ -131,7 +131,7 @@ module "vml" {
 
 
 module "md" {
-  source               = "git::https://github.com/onxpress/tf_az_base_modules.git//managed_disk?ref=v0.0.17"
+  source               = "git::https://github.com/ashwinse/tf_az_modules.git//managed_disk?ref=v0.0.17"
   for_each             = var.managed_disks
   name                 = each.value.name
   location             = var.location
@@ -149,7 +149,7 @@ module "md" {
 }
 
 module "vm-md" {
-  source                    = "git::https://github.com/onxpress/tf_az_base_modules.git//managed_disk_attach?ref=v0.0.17"
+  source                    = "git::https://github.com/ashwinse/tf_az_modules.git//managed_disk_attach?ref=v0.0.17"
   depends_on                = [module.vml, module.vmw, module.md]
   for_each                  = var.managed_disks
   managed_disk_id           = merge(module.md.*...)[each.value.name]["id"]
@@ -161,7 +161,7 @@ module "vm-md" {
 }
 
 module "vm_extension" {
-  source                    = "git::https://github.com/onxpress/tf_az_base_modules.git//vm_extensions?ref=v0.0.17"
+  source                    = "git::https://github.com/ashwinse/tf_az_modules.git//vm_extensions?ref=v0.0.17"
   depends_on                = [module.vml, module.vmw]
   for_each                  = var.vm_extensions
   name                      = each.value.name

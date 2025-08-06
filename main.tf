@@ -1,6 +1,6 @@
 
 # module "azurerm_arm" {
-#   source              = "git::https://github.com/onxpress/tf_az_base_modules.git//azurerm_arm?ref=main"
+#   source              = "git::https://github.com/ashwinse/tf_az_modules.git//azurerm_arm?ref=main"
 #   depends_on = [ module.rg ]
 #   for_each = var.az_arm
 #   name                = each.value.name
@@ -11,7 +11,7 @@
 # }
 
 # module "rg" {
-#   # source   = "git::https://github.com/onxpress/tf_az_base_modules.git//resource_group?ref=main"
+#   # source   = "git::https://github.com/ashwinse/tf_az_modules.git//resource_group?ref=main"
 #   source = "./resource_group"
 #   for_each = var.resource_groups
 #   name     = each.value.name
@@ -21,7 +21,7 @@
 
 /*
 module "vnet" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//vnet?ref=main"
+  source              = "git::https://github.com/ashwinse/tf_az_modules.git//vnet?ref=main"
   name                = "${var.prefix}-vnet"
   location            = module.rg.location
   resource_group_name = module.rg.name
@@ -34,7 +34,7 @@ module "vnet" {
 
 
 module "subnet" {
-  source               = "git::https://github.com/onxpress/tf_az_base_modules.git//subnet?ref=main"
+  source               = "git::https://github.com/ashwinse/tf_az_modules.git//subnet?ref=main"
   count                = 2
   name                 = "${var.prefix}-subnet${count.index + 1}"
   resource_group_name  = module.rg.name
@@ -49,7 +49,7 @@ module "subnet" {
 }
 
 module "route_table" {
-  source                        = "git::https://github.com/onxpress/tf_az_base_modules.git//route_table?ref=main"
+  source                        = "git::https://github.com/ashwinse/tf_az_modules.git//route_table?ref=main"
   name                          = "${var.prefix}-rt"
   location                      = module.rg.location
   resource_group_name           = module.rg.name
@@ -58,7 +58,7 @@ module "route_table" {
 }
 
 module "route" {
-  source                 = "git::https://github.com/onxpress/tf_az_base_modules.git//route?ref=main"
+  source                 = "git::https://github.com/ashwinse/tf_az_modules.git//route?ref=main"
   name                   = "${var.prefix}-rtr"
   resource_group_name    = module.rg.name
   route_table_name       = module.route_table.name
@@ -70,13 +70,13 @@ module "route" {
 
 
 module "rt_snet_attach" {
-  source         = "git::https://github.com/onxpress/tf_az_base_modules.git//route_table_subnet_attach?ref=main"
+  source         = "git::https://github.com/ashwinse/tf_az_modules.git//route_table_subnet_attach?ref=main"
   subnet_id      = module.subnet[0].id
   route_table_id = module.route_table.id
 }
 
 module "avs" {
-  source                      = "git::https://github.com/onxpress/tf_az_base_modules.git//availability_set?ref=main"
+  source                      = "git::https://github.com/ashwinse/tf_az_modules.git//availability_set?ref=main"
   name                        = "${var.prefix}-avs"
   location                    = module.rg.location
   resource_group_name         = module.rg.name
@@ -88,7 +88,7 @@ module "avs" {
 
 
 module "ddosplan" {
-  source = "git::https://github.com/onxpress/tf_az_base_modules.git//ddos_protection_plan?ref=main"
+  source = "git::https://github.com/ashwinse/tf_az_modules.git//ddos_protection_plan?ref=main"
   name                = "${var.prefix}-ddos_p_plan"
   location            = module.rg.location
   resource_group_name = module.rg.name
@@ -99,7 +99,7 @@ module "ddosplan" {
 
 
 module "nsg" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//nsg?ref=main"
+  source              = "git::https://github.com/ashwinse/tf_az_modules.git//nsg?ref=main"
   name                = "${var.prefix}-nsg"
   location            = module.rg.location
   resource_group_name = module.rg.name
@@ -118,7 +118,7 @@ locals {
 }
 
 module "nsr" {
-  source                      = "git::https://github.com/onxpress/tf_az_base_modules.git//nsr?ref=main"
+  source                      = "git::https://github.com/ashwinse/tf_az_modules.git//nsr?ref=main"
   count                       = 2
   name                        = element(local.name, count.index)
   priority                    = "20${count.index + 1}"
@@ -134,7 +134,7 @@ module "nsr" {
 }
 
 module "nsg_snet_attach" {
-  source = "git::https://github.com/onxpress/tf_az_base_modules.git//nsg_subnet_attach?ref=main"
+  source = "git::https://github.com/ashwinse/tf_az_modules.git//nsg_subnet_attach?ref=main"
   subnet_id                 = module.subnet[0].id
   network_security_group_id = module.nsg.id
 }
@@ -142,7 +142,7 @@ module "nsg_snet_attach" {
 
 
 module "sa" {
-  source                   = "git::https://github.com/onxpress/tf_az_base_modules.git//storage_account?ref=main"
+  source                   = "git::https://github.com/ashwinse/tf_az_modules.git//storage_account?ref=main"
   name                     = "${var.prefix}sa${random_id.id.hex}"
   location                 = module.rg.location
   resource_group_name      = module.rg.name
@@ -174,7 +174,7 @@ module "sa" {
 } 
 
 module "pip" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//public_ip?ref=main"
+  source              = "git::https://github.com/ashwinse/tf_az_modules.git//public_ip?ref=main"
   name                = "${var.prefix}-pip"
   location            = module.rg.location
   resource_group_name = module.rg.name
@@ -184,7 +184,7 @@ module "pip" {
 }
 
 module "wnic" {
-  source                        = "git::https://github.com/onxpress/tf_az_base_modules.git//network_interface?ref=main"
+  source                        = "git::https://github.com/ashwinse/tf_az_modules.git//network_interface?ref=main"
   name                          = "${var.prefix}-wnic"
   location                      = module.rg.location
   resource_group_name           = module.rg.name
@@ -195,7 +195,7 @@ module "wnic" {
 }
 
 module "md" {
-  source               = "git::https://github.com/onxpress/tf_az_base_modules.git//managed_disk?ref=main"
+  source               = "git::https://github.com/ashwinse/tf_az_modules.git//managed_disk?ref=main"
   name                 = "dd-${var.prefix}-d-01"
   location             = module.rg.location
   resource_group_name  = module.rg.name
@@ -208,7 +208,7 @@ module "md" {
 }
 
 module "vmw" {
-  source                   = "git::https://github.com/onxpress/tf_az_base_modules.git//vm_windows?ref=main"
+  source                   = "git::https://github.com/ashwinse/tf_az_modules.git//vm_windows?ref=main"
   name                     = "${var.prefix}-vmw"
   resource_group_name      = module.rg.name
   location                 = module.rg.location
@@ -233,7 +233,7 @@ module "vmw" {
 
 
 module "lnic" {
-  source                        = "git::https://github.com/onxpress/tf_az_base_modules.git//network_interface?ref=main"
+  source                        = "git::https://github.com/ashwinse/tf_az_modules.git//network_interface?ref=main"
   name                          = "${var.prefix}-lnic"
   location                      = module.rg.location
   resource_group_name           = module.rg.name
@@ -244,7 +244,7 @@ module "lnic" {
 }
 
 module "vml" {
-  source                          = "git::https://github.com/onxpress/tf_az_base_modules.git//vm_linux?ref=main"
+  source                          = "git::https://github.com/ashwinse/tf_az_modules.git//vm_linux?ref=main"
   name                            = "${var.prefix}-vml"
   resource_group_name             = module.rg.name
   location                        = module.rg.location
@@ -269,14 +269,14 @@ module "vml" {
 
 
 module "vmw-md" {
-  source = "git::https://github.com/onxpress/tf_az_base_modules.git//managed_disk_attach?ref=main" 
+  source = "git::https://github.com/ashwinse/tf_az_modules.git//managed_disk_attach?ref=main" 
   managed_disk_id    = module.md.id
   virtual_machine_id = module.vmw.id
   lun                = "10"
   caching            = "None"
 }
 module "vml-md" {
-  source = "git::https://github.com/onxpress/tf_az_base_modules.git//managed_disk_attach?ref=main"
+  source = "git::https://github.com/ashwinse/tf_az_modules.git//managed_disk_attach?ref=main"
   managed_disk_id    = module.md.id
   virtual_machine_id = module.vml.id
   lun                = "11"
@@ -286,7 +286,7 @@ module "vml-md" {
 
 
 module "kv" {
-  source                 = "git::https://github.com/onxpress/tf_az_base_modules.git//key_vault?ref=main"
+  source                 = "git::https://github.com/ashwinse/tf_az_modules.git//key_vault?ref=main"
   name                   = "${var.prefix}-kv-${random_id.id.hex}"
   location               = module.rg.location
   resource_group_name    = module.rg.name
@@ -299,7 +299,7 @@ module "kv" {
 }
 
 module "pip2" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//public_ip?ref=main"
+  source              = "git::https://github.com/ashwinse/tf_az_modules.git//public_ip?ref=main"
   name                = "${var.prefix}-pip2"
   location            = module.rg.location
   resource_group_name = module.rg.name
@@ -309,7 +309,7 @@ module "pip2" {
 }
 
 module "lb" {
-  source                         = "git::https://github.com/onxpress/tf_az_base_modules.git//lb?ref=main"
+  source                         = "git::https://github.com/ashwinse/tf_az_modules.git//lb?ref=main"
   name                           = "${var.prefix}-lb"
   location                       = module.rg.location
   resource_group_name            = module.rg.name
@@ -320,14 +320,14 @@ module "lb" {
 }
 
 module "lbap" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//lb_backend_address_pool?ref=main"
+  source              = "git::https://github.com/ashwinse/tf_az_modules.git//lb_backend_address_pool?ref=main"
   resource_group_name = module.rg.name
   loadbalancer_id     = module.lb.id
   name                = "${var.prefix}-lb-bkpool"
 }
 
 module "lbp" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//lb_probe?ref=main"
+  source              = "git::https://github.com/ashwinse/tf_az_modules.git//lb_probe?ref=main"
   loadbalancer_id     = module.lb.id
   resource_group_name = module.rg.name
   name                = "ssh_hlth_probe"
@@ -336,7 +336,7 @@ module "lbp" {
 
 
 module "lbr" {
-  source                         = "git::https://github.com/onxpress/tf_az_base_modules.git//lb_rule?ref=main"
+  source                         = "git::https://github.com/ashwinse/tf_az_modules.git//lb_rule?ref=main"
   resource_group_name            = module.rg.name
   loadbalancer_id                = module.lb.id
   name                           = "${var.prefix}-lb-rule"
@@ -349,7 +349,7 @@ module "lbr" {
 }
 
 module "lbnp" {
-  source = "git::https://github.com/onxpress/tf_az_base_modules.git//lb_nat_pool?ref=main"
+  source = "git::https://github.com/ashwinse/tf_az_modules.git//lb_nat_pool?ref=main"
   resource_group_name = module.rg.name
   loadbalancer_id = module.lb.id
   name = "${var.prefix}-nat-pool"
@@ -363,7 +363,7 @@ module "lbnp" {
 
 
  module "lbnr" {
-  source                         = "git::https://github.com/onxpress/tf_az_base_modules.git//lb_nat_rule?ref=main"
+  source                         = "git::https://github.com/ashwinse/tf_az_modules.git//lb_nat_rule?ref=main"
   resource_group_name            = module.rg.name
   loadbalancer_id                = module.lb.id
   name                           = "${var.prefix}-lb-natrule"
@@ -385,7 +385,7 @@ resource "random_id" "id" {
 }
 
 module "rg" {
-  source   = "git::https://github.com/onxpress/tf_az_base_modules.git//resource_group?ref=main"
+  source   = "git::https://github.com/ashwinse/tf_az_modules.git//resource_group?ref=main"
   for_each = var.resource_group
   name     = each.value.name
   location = each.value.location
@@ -394,7 +394,7 @@ module "rg" {
 
 
 module "vnet" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//vnet?ref=main"
+  source              = "git::https://github.com/ashwinse/tf_az_modules.git//vnet?ref=main"
   for_each            = var.vnet
   name                = each.value.name
   location            = module.rg["rg0"].location
@@ -404,7 +404,7 @@ module "vnet" {
 }
 
 module "subnet" {
-  source               = "git::https://github.com/onxpress/tf_az_base_modules.git//subnet?ref=main"
+  source               = "git::https://github.com/ashwinse/tf_az_modules.git//subnet?ref=main"
   for_each             = var.subnets
   name                 = each.value.name
   resource_group_name  = module.rg["rg0"].name
@@ -413,7 +413,7 @@ module "subnet" {
 }
 
 module "pip" {
-  source              = "git::https://github.com/onxpress/tf_az_base_modules.git//public_ip?ref=main"
+  source              = "git::https://github.com/ashwinse/tf_az_modules.git//public_ip?ref=main"
   for_each             = var.public_ip
   name                = each.value.name
   location            = module.rg["rg0"].location
@@ -425,7 +425,7 @@ module "pip" {
 
 
 module "avset" {
-  source                      = "git::https://github.com/onxpress/tf_az_base_modules.git//availability_set?ref=main"
+  source                      = "git::https://github.com/ashwinse/tf_az_modules.git//availability_set?ref=main"
   for_each                    = var.avsets
   name                        = each.value.name
   location                    = module.rg["rg0"].location
@@ -436,7 +436,7 @@ module "avset" {
 }
 
 module "vm_pack" {
-  source                          = "git::https://github.com/onxpress/tf_az_base_modules.git//vm_pack?ref=main"
+  source                          = "git::https://github.com/ashwinse/tf_az_modules.git//vm_pack?ref=main"
   depends_on                      = [module.rg, module.vnet, module.subnet, module.avset, module.image_agreement]
   os_type                         = each.value.os_type
   for_each                        = var.vms
@@ -540,7 +540,7 @@ module "vm_pack" {
 # }
 
 # module "vnet_peer" {
-#   source              = "git::https://github.com/onxpress/tf_az_base_modules.git//vnet_peering?ref=main"
+#   source              = "git::https://github.com/ashwinse/tf_az_modules.git//vnet_peering?ref=main"
 #   depends_on = [ module.vnet ]
 #   providers = {
 #     azurerm.hub = azurerm.hub
@@ -556,7 +556,7 @@ module "vm_pack" {
 # }
 
 # module "private_endpoint" {
-#   # source              = "git::https://github.com/onxpress/tf_az_base_modules.git//vazurerm_arm?ref=main"
+#   # source              = "git::https://github.com/ashwinse/tf_az_modules.git//vazurerm_arm?ref=main"
 #   # depends_on = [ module.rg ]
 #   for_each = var.private_endpoint
 #   name                = each.value.name
@@ -594,7 +594,7 @@ module "vm_pack" {
 # }
 
 # module "virtual_network_gateway" {
-#   # source              = "git::https://github.com/onxpress/tf_az_base_modules.git//vazurerm_arm?ref=main"
+#   # source              = "git::https://github.com/ashwinse/tf_az_modules.git//vazurerm_arm?ref=main"
 #   source = "../virtual_network_gateway"
 #   depends_on = [ module.pip ]
 #   for_each = var.vpn_gateway
@@ -618,7 +618,7 @@ module "vm_pack" {
 # }
 
 # module "local_network_gateway" {
-#   # source              = "git::https://github.com/onxpress/tf_az_base_modules.git//public_ip?ref=v0.0.3"
+#   # source              = "git::https://github.com/ashwinse/tf_az_modules.git//public_ip?ref=v0.0.3"
 #   source = "../local_network_gateway"
 #   for_each = var.ln_gateway
 #   name                = each.value.name
@@ -631,7 +631,7 @@ module "vm_pack" {
 # }
 
 # module "gw_conn" {
-#   # source              = "git::https://github.com/onxpress/tf_az_base_modules.git//vn_gateway_connection?ref=main"
+#   # source              = "git::https://github.com/ashwinse/tf_az_modules.git//vn_gateway_connection?ref=main"
 #   for_each = var.gw_connection
 #   name                = each.value.name
 #   location            = each.value.location == null ? local.location : each.value.location
@@ -646,7 +646,7 @@ module "vm_pack" {
 # }
 #
 # module "firewall" {
-#   source              = "git::https://github.com/onxpress/tf_az_base_modules.git//firewall?ref=v0.0.5"
+#   source              = "git::https://github.com/ashwinse/tf_az_modules.git//firewall?ref=v0.0.5"
 #   for_each            = var.firewall
 #   name                = each.value.name
 #   location            = each.value.location == null ? local.location : each.value.location
@@ -661,7 +661,7 @@ module "vm_pack" {
 # }
 #
 # module "fw_policy" {
-#   # source              = "git::https://github.com/onxpress/tf_az_base_modules.git//firewall_policy?ref=main"
+#   # source              = "git::https://github.com/ashwinse/tf_az_modules.git//firewall_policy?ref=main"
 #   for_each            = var.fw_policy
 #   name                = each.value.name
 #   location            = each.value.location == null ? local.location : each.value.location
@@ -673,7 +673,7 @@ module "vm_pack" {
 # }
 
 # module "fw_rule_coll" {
-#   # source              = "git::https://github.com/onxpress/tf_az_base_modules.git//firewall_policy_rule_collection_group?ref=main"
+#   # source              = "git::https://github.com/ashwinse/tf_az_modules.git//firewall_policy_rule_collection_group?ref=main"
 #   depends_on = [ module.fw_policy ]
 #   for_each            = var.fw_rule_coll
 #   name                = each.value.name
@@ -688,7 +688,7 @@ module "vm_pack" {
 #############################################  CDN FRONTFOOR #################################################################
 
 # module "cdn_fd_profile" {
-#   source                   = "git::https://github.com/onxpress/tf_az_base_modules.git//cdn_frontdoor_profile?ref=IAC-28-Frontdoor"
+#   source                   = "git::https://github.com/ashwinse/tf_az_modules.git//cdn_frontdoor_profile?ref=IAC-28-Frontdoor"
 #   depends_on               = [module.rg]
 #   for_each                 = var.frontdoor_profile
 #   name                     = each.value.name
@@ -699,7 +699,7 @@ module "vm_pack" {
 # }
 
 # module "cdn_fd_ep" {
-#   source                   = "git::https://github.com/onxpress/tf_az_base_modules.git//cdn_frontdoor_endpoint?ref=IAC-28-Frontdoor"
+#   source                   = "git::https://github.com/ashwinse/tf_az_modules.git//cdn_frontdoor_endpoint?ref=IAC-28-Frontdoor"
 #   depends_on               = [module.cdn_fd_profile]
 #   for_each                 = var.fd_eps
 #   name                     = each.value.name
@@ -708,7 +708,7 @@ module "vm_pack" {
 # }
 
 # module "cdn_fd_og" {
-#   source                             = "git::https://github.com/onxpress/tf_az_base_modules.git//cdn_frontdoor_origin_group?ref=IAC-28-Frontdoor"
+#   source                             = "git::https://github.com/ashwinse/tf_az_modules.git//cdn_frontdoor_origin_group?ref=IAC-28-Frontdoor"
 #   depends_on                         = [module.cdn_fd_profile]
 #   for_each                           = var.fd_ogs
 #   name                               = each.value.name
@@ -721,7 +721,7 @@ module "vm_pack" {
 # }
 
 # module "cdn_fd_origins" {
-#   source                         = "git::https://github.com/onxpress/tf_az_base_modules.git//cdn_frontdoor_origin?ref=IAC-28-Frontdoor"
+#   source                         = "git::https://github.com/ashwinse/tf_az_modules.git//cdn_frontdoor_origin?ref=IAC-28-Frontdoor"
 #   depends_on                     = [module.cdn_fd_profile, module.cdn_fd_og]
 #   for_each                       = var.fd_origins
 #   name                           = each.value.name
@@ -737,7 +737,7 @@ module "vm_pack" {
 # }
 
 # module "cdn_fd_custom_domains" {
-#   source                   = "git::https://github.com/onxpress/tf_az_base_modules.git//cdn_frontdoor_custom_domain?ref=IAC-28-Frontdoor"
+#   source                   = "git::https://github.com/ashwinse/tf_az_modules.git//cdn_frontdoor_custom_domain?ref=IAC-28-Frontdoor"
 #   depends_on               = [module.cdn_fd_profile]
 #   for_each                 = var.fd_custom_domains
 #   name                     = each.value.name
@@ -749,7 +749,7 @@ module "vm_pack" {
 # }
 
 # module "cdn_frontdoor_route" {
-#   source                          = "git::https://github.com/onxpress/tf_az_base_modules.git//cdn_frontdoor_route?ref=IAC-28-Frontdoor"
+#   source                          = "git::https://github.com/ashwinse/tf_az_modules.git//cdn_frontdoor_route?ref=IAC-28-Frontdoor"
 #   depends_on                      = [module.cdn_fd_ep, module.cdn_fd_og, module.cdn_fd_origins]
 #   for_each                        = var.fd_routes
 #   name                            = each.value.name
